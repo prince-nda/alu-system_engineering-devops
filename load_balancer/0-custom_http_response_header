@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
-# Configure Nginx server so that /redirect_me is redirecting to another page
+# Configure Nginx server with custom X-Served-By header
 
 sudo apt-get update -y
 sudo apt-get install -y nginx
+
+# Get the actual hostname
+HOSTNAME=$(hostname)
+
 config=\
 "server {
         listen 80 default_server;
@@ -10,9 +14,22 @@ config=\
         root /var/www/html;
         index index.html index.htm index.nginx-debian.html;
         server_name _;
-	add_header X-Served-By \$HOSTNAME;
+        
+        location / {
+            add_header X-Served-By $HOSTNAME;
+            try_files \$uri \$uri/ =404;
+        }
 }
 "
-sudo chown -R "$USER":"$USER" /etc/nginx/sites-available/default
-echo "$config" > /etc/nginx/sites-available/default
+
+# Create or overwrite the default configuration
+echo "$config" | sudo tee /etc/nginx/sites-available/default > /dev/null
+
+# Test the configuration before restarting
+sudo nginx -t
+
+# Restart Nginx
 sudo service nginx restart
+
+# Enable Nginx to start on boot
+sudo systemctl enable nginx
