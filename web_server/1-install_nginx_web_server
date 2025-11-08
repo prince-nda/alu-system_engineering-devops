@@ -3,7 +3,7 @@
 
 # Ensure packages are updated and nginx is installed
 sudo apt-get update -y
-sudo apt-get install -y nginx
+sudo apt-get install nginx -y
 
 # Make sure nginx is running
 service nginx start
