@@ -5,6 +5,9 @@
 sudo apt-get update -y
 sudo apt-get install -y nginx
 
+# Make sure nginx is running
+service nginx start
+
 # Write required page content using sudo
 echo "Holberton School" | sudo tee /var/www/html/index.nginx-debian.html > /dev/null
 
