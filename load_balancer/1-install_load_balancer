@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 # Configures HAProxy to accept requests on port 80 and redirect to web servers
 
-sudo apt update -y
-sudo apt install haproxy -y
+# Update package list and install HAProxy
+sudo apt-get update -y
+sudo apt-get install -y haproxy
 
-# Backup original config
-sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.backup
-
-# Create new config
-sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOF
+# Configure HAProxy
+sudo bash -c 'cat > /etc/haproxy/haproxy.cfg << EOF
 global
     daemon
     maxconn 256
@@ -21,15 +19,14 @@ defaults
 
 frontend http_front
     bind *:80
-    stats uri /haproxy?stats
     default_backend http_back
 
 backend http_back
     balance roundrobin
     server 6912-web-01 3.89.121.247:80 check
     server 6912-web-02 34.227.27.109:80 check
-EOF
+EOF'
 
-# Enable and start HAProxy
+# Enable and restart HAProxy
 sudo systemctl enable haproxy
 sudo systemctl restart haproxy
